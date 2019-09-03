@@ -6,9 +6,11 @@ type Package struct {
 }
 
 type Error struct {
-	Name   string  `json:"name" toml:"name"`
-	Code   int     `json:"code" toml:"code"`
-	Fields []Field `json:"fields" toml:"field"`
+	Name     string  `json:"name"`
+	Code     int     `json:"code"`
+	Message  string  `json:"message"`
+	UnwrapOn string  `json:"unwrap_on"`
+	Fields   []Field `json:"fields" toml:"field"`
 }
 
 type Field struct {
