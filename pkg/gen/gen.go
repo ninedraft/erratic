@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go/ast"
 	"go/token"
+	"sort"
 	"strings"
 )
 
@@ -14,10 +15,10 @@ func Ident(name string) *ast.Ident {
 }
 
 // StructTypeDecl returns a struct type declaration with provided fields declarations.
-func StructTypeDecl(name, doc string, fields ...*ast.Field) *ast.GenDecl {
+func StructTypeDecl(name string, doc *ast.CommentGroup, fields ...*ast.Field) *ast.GenDecl {
 	var spec = &ast.TypeSpec{
 		Name: Ident(name),
-		Doc:  Doc(doc),
+		Doc:  doc,
 		Type: &ast.StructType{
 			Fields: &ast.FieldList{
 				List: fields,
@@ -98,10 +99,32 @@ func DefaultTags(fieldName string) Tags {
 }
 
 // Field returns a field declaration with provided name, doc, tags and type.
-func Field(name, doc string, tags *ast.BasicLit, ft ast.Expr) *ast.Field {
+func Field(name, doc *ast.CommentGroup, tags *ast.BasicLit, ft ast.Expr) *ast.Field {
 	return &ast.Field{
-		Doc:  Doc(doc),
+		Doc:  doc,
 		Type: ft,
 		Tag:  tags,
 	}
+}
+
+// Fields contains represents key-value field value declarations.
+type Fields map[string]ast.Expr
+
+// Names returns fields sorted names.
+func (fields Fields) Names() []string {
+	var names = make([]string, 0, len(fields))
+	for name := range fields {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	return names
+}
+
+// AST returns slice of key-value field experessions, sorted by names.
+func (fields Fields) AST() []*ast.KeyValueExpr {
+	var kv = make([]*ast.KeyValueExpr, 0, len(fields))
+	for _, name := range fields.Names() {
+		kv = append(kv, FieldExpr(name, fields[name]))
+	}
+	return kv
 }
