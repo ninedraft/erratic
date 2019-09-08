@@ -99,11 +99,12 @@ func DefaultTags(fieldName string) Tags {
 }
 
 // Field returns a field declaration with provided name, doc, tags and type.
-func Field(name, doc *ast.CommentGroup, tags *ast.BasicLit, ft ast.Expr) *ast.Field {
+func Field(name string, doc *ast.CommentGroup, tags *ast.BasicLit, ft ast.Expr) *ast.Field {
 	return &ast.Field{
-		Doc:  doc,
-		Type: ft,
-		Tag:  tags,
+		Names: []*ast.Ident{Ident(name)},
+		Doc:   doc,
+		Type:  ft,
+		Tag:   tags,
 	}
 }
 
@@ -127,4 +128,17 @@ func (fields Fields) AST() []*ast.KeyValueExpr {
 		kv = append(kv, FieldExpr(name, fields[name]))
 	}
 	return kv
+}
+
+func Var(name string, doc *ast.CommentGroup, value ast.Expr) *ast.GenDecl {
+	return &ast.GenDecl{
+		Doc: doc,
+		Tok: token.VAR,
+		Specs: []ast.Spec{
+			&ast.ValueSpec{
+				Names:  []*ast.Ident{Ident(name)},
+				Values: []ast.Expr{value},
+			},
+		},
+	}
 }

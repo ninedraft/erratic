@@ -1,10 +1,18 @@
 package gen
 
-import "go/ast"
+import (
+	"go/ast"
+	"go/token"
+	"strconv"
+)
 
 // String returns a string identifier.
 func String() *ast.Ident {
 	return Ident("string")
+}
+
+func StringLit(str string) *ast.BasicLit {
+	return &ast.BasicLit{Kind: token.STRING, Value: strconv.Quote(str)}
 }
 
 // Error returns a string identifier.
